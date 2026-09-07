@@ -74,7 +74,6 @@ app.delete("/api/visits", (req, res) => {
   res.json({ ok: true });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`IP location tracker running on http://localhost:${PORT}`);
-  console.log(`Admin key: ${ADMIN_KEY}`);
 });
