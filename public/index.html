@@ -38,7 +38,7 @@ th,td{text-align:left;padding:10px;border-bottom:1px solid #e7eaf0;font-size:14p
 <div class="card">
 <table>
 <thead><tr><th>Time</th><th>IP</th><th>Approx. location</th><th>Latitude</th><th>Longitude</th><th>Accuracy</th><th>Map</th><th>ISP</th></tr></thead>
-<tbody id="rows"><tr><td colspan="4">No data</td></tr></tbody>
+<tbody id="rows"><tr><td colspan="8">No data</td></tr></tbody>
 </table>
 </div>
 </div>
@@ -55,9 +55,13 @@ async function loadVisits(){
     <tr>
       <td>${new Date(v.time).toLocaleString()}</td>
       <td>${v.ip}</td>
-      <td>${v.city}, ${v.region}, ${v.country}</td>
+      <td>${v.city || "GPS"}, ${v.region || ""}, ${v.country || ""}</td>
+      <td>${v.latitude ?? "-"}</td>
+      <td>${v.longitude ?? "-"}</td>
+      <td>${v.accuracy != null ? v.accuracy + " m" : "-"}</td>
+      <td>${typeof v.latitude === "number" && typeof v.longitude === "number" ? `<a href="https://www.google.com/maps?q=${v.latitude},${v.longitude}" target="_blank">📍 Map</a>` : "-"}</td>
       <td>${v.isp}</td>
-    </tr>`).join(""):"<tr><td colspan='4'>No data</td></tr>";
+    </tr>`).join(""):"<tr><td colspan='8'>No data</td></tr>";
 }
 async function clearVisits(){
   const key=document.getElementById("key").value;
