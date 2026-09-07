@@ -1,13 +1,65 @@
 <!doctype html>
 <html lang="hi">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Page</title>
+<title>Location Sharing</title>
 <style>
-body{font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#f6f7fb}
-div{background:#fff;padding:30px;border-radius:16px;box-shadow:0 8px 30px #0001;text-align:center}
+body{font-family:Arial,sans-serif;background:#f3f4f6;margin:0;padding:30px}
+.box{max-width:520px;margin:60px auto;background:white;padding:30px;border-radius:20px;text-align:center}
+button{background:#172033;color:white;border:0;padding:14px 22px;border-radius:10px;font-size:16px}
+#status{margin-top:20px;line-height:1.6}
 </style>
 </head>
-<body><div><h2>Page opened</h2><p>यह पेज आपके IP address से सामान्य location का अनुमान लगा सकता है। यह GPS location नहीं है।</p></div></body>
+<body>
+<div class="box">
+<h2>Location Sharing</h2>
+<p>यह पेज आपकी exact location तभी प्राप्त करेगा जब आप Location permission देकर अनुमति देंगे।</p>
+<button onclick="shareLocation()">Allow Location</button>
+<div id="status"></div>
+</div>
+
+<script>
+async function shareLocation(){
+  const status=document.getElementById("status");
+  if(!navigator.geolocation){
+    status.textContent="इस browser में location सुविधा उपलब्ध नहीं है।";
+    return;
+  }
+
+  status.textContent="Location permission का इंतज़ार है...";
+
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const data={
+      id:new URLSearchParams(location.search).get("id")||"unknown",
+      latitude:pos.coords.latitude,
+      longitude:pos.coords.longitude,
+      accuracy:pos.coords.accuracy
+    };
+
+    try{
+      const r=await fetch("/api/gps",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(data)
+      });
+
+      if(r.ok){
+        status.textContent="Location successfully shared.";
+      }else{
+        status.textContent="Location मिली, लेकिन server पर भेजी नहीं जा सकी।";
+      }
+    }catch(e){
+      status.textContent="Server से connection नहीं हो पाया।";
+    }
+  },err=>{
+    status.textContent="Location permission नहीं दी गई या location उपलब्ध नहीं हुई।";
+  },{
+    enableHighAccuracy:true,
+    timeout:15000,
+    maximumAge:0
+  });
+}
+</script>
+</body>
 </html>

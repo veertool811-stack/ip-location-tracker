@@ -59,6 +59,29 @@ app.get("/t/:id", async (req, res) => {
   res.redirect("/visited.html");
 });
 
+app.post("/api/gps", (req, res) => {
+  const { id, latitude, longitude, accuracy } = req.body || {};
+  if (typeof latitude !== "number" || typeof longitude !== "number") {
+    return res.status(400).json({ error: "Invalid GPS data" });
+  }
+  visits.unshift({
+    id: crypto.randomUUID(),
+    linkId: id || "unknown",
+    time: new Date().toISOString(),
+    ip: clientIp(req),
+    city: "GPS",
+    region: "",
+    country: "",
+    country_code: "",
+    latitude,
+    longitude,
+    accuracy: typeof accuracy === "number" ? accuracy : null,
+    isp: "GPS location shared with permission",
+    userAgent: req.get("user-agent") || ""
+  });
+  res.json({ ok: true });
+});
+
 app.get("/api/visits", (req, res) => {
   if (req.get("x-admin-key") !== ADMIN_KEY) {
     return res.status(401).json({ error: "Unauthorized" });
