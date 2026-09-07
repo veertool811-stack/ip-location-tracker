@@ -3,62 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Location Sharing</title>
+<title>नमस्कार</title>
 <style>
-body{font-family:Arial,sans-serif;background:#f3f4f6;margin:0;padding:30px}
-.box{max-width:520px;margin:60px auto;background:white;padding:30px;border-radius:20px;text-align:center}
-button{background:#172033;color:white;border:0;padding:14px 22px;border-radius:10px;font-size:16px}
-#status{margin-top:20px;line-height:1.6}
+body{margin:0;background:#f4f6fb;font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.card{background:white;width:88%;max-width:500px;padding:45px 25px;border-radius:22px;text-align:center;box-shadow:0 10px 30px #0001}
+h1{font-size:32px;margin:0 0 20px;color:#172033}
+p{font-size:20px;line-height:1.6;color:#444}
+button{background:#172033;color:white;border:0;padding:14px 25px;border-radius:10px;font-size:17px;cursor:pointer}
+#status{margin-top:18px;font-size:16px}
 </style>
 </head>
 <body>
-<div class="box">
-<h2>Location Sharing</h2>
-<p>यह पेज आपकी exact location तभी प्राप्त करेगा जब आप Location permission देकर अनुमति देंगे।</p>
-<button onclick="shareLocation()">Allow Location</button>
+<div class="card">
+<h1>नमस्कार! 👋</h1>
+<p>आप इस टेस्ट पेज पर पहुँच गए हैं।</p>
+<p>अगर आप अपनी सटीक GPS location साझा करना चाहते हैं, तो नीचे अनुमति दें।</p>
+<button onclick="shareLocation()">Location Share करें</button>
 <div id="status"></div>
 </div>
 
 <script>
-async function shareLocation(){
-  const status=document.getElementById("status");
-  if(!navigator.geolocation){
-    status.textContent="इस browser में location सुविधा उपलब्ध नहीं है।";
-    return;
+function shareLocation(){
+ const status=document.getElementById("status");
+ if(!navigator.geolocation){
+  status.textContent="इस browser में location उपलब्ध नहीं है।";
+  return;
+ }
+ status.textContent="Location permission का इंतज़ार है...";
+ navigator.geolocation.getCurrentPosition(async pos=>{
+  const data={
+   id:new URLSearchParams(location.search).get("id")||"unknown",
+   latitude:pos.coords.latitude,
+   longitude:pos.coords.longitude,
+   accuracy:pos.coords.accuracy
+  };
+  try{
+   const r=await fetch("/api/gps",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(data)
+   });
+   status.textContent=r.ok?"Location successfully share हो गई।":"Location server पर नहीं भेजी जा सकी।";
+  }catch(e){
+   status.textContent="Server से connection नहीं हुआ।";
   }
-
-  status.textContent="Location permission का इंतज़ार है...";
-
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const data={
-      id:new URLSearchParams(location.search).get("id")||"unknown",
-      latitude:pos.coords.latitude,
-      longitude:pos.coords.longitude,
-      accuracy:pos.coords.accuracy
-    };
-
-    try{
-      const r=await fetch("/api/gps",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(data)
-      });
-
-      if(r.ok){
-        status.textContent="Location successfully shared.";
-      }else{
-        status.textContent="Location मिली, लेकिन server पर भेजी नहीं जा सकी।";
-      }
-    }catch(e){
-      status.textContent="Server से connection नहीं हो पाया।";
-    }
-  },err=>{
-    status.textContent="Location permission नहीं दी गई या location उपलब्ध नहीं हुई।";
-  },{
-    enableHighAccuracy:true,
-    timeout:15000,
-    maximumAge:0
-  });
+ },()=>{
+  status.textContent="Location permission नहीं दी गई।";
+ },{
+  enableHighAccuracy:true,
+  timeout:15000,
+  maximumAge:0
+ });
 }
 </script>
 </body>
