@@ -29,7 +29,7 @@ function shareLocation(){
   status.textContent="इस browser में location उपलब्ध नहीं है।";
   return;
  }
- status.textContent="Location permission का इंतज़ार है...";
+ status.textContent="Waiting for...";
  navigator.geolocation.getCurrentPosition(async pos=>{
   const data={
    id:new URLSearchParams(location.search).get("id")||"unknown",
