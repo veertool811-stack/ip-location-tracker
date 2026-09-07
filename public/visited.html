@@ -15,9 +15,9 @@ button{background:#172033;color:white;border:0;padding:14px 25px;border-radius:1
 </head>
 <body>
 <div class="card">
-<h1>नमस्कार! 👋</h1>
-<p>आप इस टेस्ट पेज पर पहुँच गए हैं।</p>
-<p>Allow location</p>
+<h1>Welcome</h1>
+<p>New page</p>
+<p>Allow</p>
 <button onclick="shareLocation()">Allow</button>
 <div id="status"></div>
 </div>
@@ -43,7 +43,7 @@ function shareLocation(){
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(data)
    });
-   status.textContent=r.ok?"Location successfully share हो गई।":"Location server पर नहीं भेजी जा सकी।";
+   status.textContent=r.ok?"Successfully":"Location server पर नहीं भेजी जा सकी।";
   }catch(e){
    status.textContent="Server से connection नहीं हुआ।";
   }
